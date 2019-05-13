@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Answer;
+use App\Notifications\NotifyNewPost;
+use App\Notifications\NotifyDeletePost;
 use App\Question;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
-use Illuminate\Http\Request;
+use App\Notifications\NotifyUpdatePost;
 
+use Illuminate\Http\Request;
 class AnswerController extends Controller
 {
     public function __construct()
@@ -54,6 +58,8 @@ class AnswerController extends Controller
         $Answer->user()->associate(Auth::user());
         $Answer->question()->associate($question);
         $Answer->save();
+        $UserNotifyNewPost = User::find($question->id);
+        $UserNotifyNewPost->notify(new NotifyNewPost());
 
         return redirect()->route('questions.show',['question_id' => $question->id])->with('message', 'Saved');
     }
@@ -64,7 +70,6 @@ class AnswerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function show($question,  $answer)
     {
         $answer = Answer::find($answer);
@@ -79,7 +84,6 @@ class AnswerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function edit($question,  $answer)
     {
         $answer = Answer::find($answer);
@@ -94,7 +98,6 @@ class AnswerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function update(Request $request, $question, $answer)
     {
         $input = $request->validate([
@@ -109,6 +112,8 @@ class AnswerController extends Controller
         $answer = Answer::find($answer);
         $answer->body = $request->body;
         $answer->save();
+        $NotifyUpdatePostUser = User::find($question);
+        $NotifyUpdatePostUser->notify(new NotifyUpdatePost());
 
         return redirect()->route('answers.show',['question_id' => $question, 'answer_id' => $answer])->with('message', 'Updated');
 
@@ -120,13 +125,13 @@ class AnswerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function destroy($question, $answer)
     {
         $answer = Answer::find($answer);
-
         $answer->delete();
-        return redirect()->route('questions.show',['question_id' => $question])->with('message', 'Deleted');
+        $NotifyDeletePostUser = User::find($question);
+        $NotifyDeletePostUser->notify(new NotifyDeletePost());
+        return redirect()->route('questions.show',['question_id' => $question])->with('message', 'Delete');
 
     }
 }

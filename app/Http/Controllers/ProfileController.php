@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Profile;
 use App\User;
 
-
 class ProfileController extends Controller
 {
     /**
@@ -45,15 +44,19 @@ class ProfileController extends Controller
             'lname' => 'required',
             'body' => 'required',
         ], [
+
             'fname.required' => ' First is required',
             'lname.required' => ' Last is required',
             'body.required' => ' Body is required',
         ]);
         $input = request()->all();
+
         $profile = new Profile($input);
         $profile->user()->associate(Auth::user());
         $profile->save();
+
         return redirect()->route('home')->with('message', 'Profile Created');
+
     }
 
     /**
@@ -75,14 +78,15 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function edit($user, $profile)
     {
         $user = User::find($user);
         $profile = $user->profile;
         $edit = TRUE;
+
         return view('profileForm', ['profile' => $profile, 'edit' => $edit ]);
     }
+
     /**
      * Update the specified resource in storage.
      *
@@ -96,16 +100,27 @@ class ProfileController extends Controller
             'fname' => 'required',
             'lname' => 'required',
         ], [
+
             'fname.required' => ' First is required',
             'lname.required' => ' Last is required',
+
         ]);
         $profile = Profile::find($profile);
         $profile->fname = $request->lname;
         $profile->lname = $request->lname;
         $profile->body = $request->body;
         $profile->save();
+
         return redirect()->route('home')->with('message', 'Updated Profile');
     }
+
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($id)
     {
         //
