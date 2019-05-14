@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\Auth;
 
 class QuestionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
     public function index()
     {
         //
@@ -54,6 +54,7 @@ class QuestionController extends Controller
         return redirect()->route('home')->with('message', 'IT WORKS!');
         // return redirect()->route('questions.show', ['id' => $question->id]);
     }
+
     /**
      * Display the specified resource.
      *
@@ -95,6 +96,8 @@ class QuestionController extends Controller
         $question->save();
         return redirect()->route('questions.show',['question_id' => $question->id])->with('message', 'Saved');
     }
+
+
     /**
      * Remove the specified resource from storage.
      *
@@ -106,5 +109,4 @@ class QuestionController extends Controller
         $question->delete();
         return redirect()->route('home')->with('message', 'Deleted');
     }
-
 }
